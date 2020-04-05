@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <style>
+        .box1{
+            box-shadow: 7px  7px 15px 0px;
+            display: flex;
+            margin-bottom: 20px;
+            justify-content: space-between ;
+        }
+        .score{
+            padding: 30px;
+            display: flex;
+            flex: 1;
+            flex-direction: column;
+            align-items: center;
+        }
+        .box2{
+            box-shadow: 1px  1px 3px 1px;
+            display: flex;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+        .box3{
+            flex-direction: column-reverse;
+            box-shadow: 0px  0px 3px 1px;
+            display: flex;
+            padding: 20px 0px 15px 0px ;
+        }
+
+        .life{
+            height: 15px;
+            background-color: green;
+            align-self: flex-start;
+            border: solid 2px gray;
+        }
+        .message{
+            display: flex;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+            margin: 0px 25px 5px 25px ;
+        }
+        button{
+            width: 80px;
+            height: 40px;
+        }
+    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="app">
+        <div class="box1">
+            <div class= "score">
+                <h1><div>Jogador</div></h1>
+                <div class="life" :style="{'width': vidaJogador+'%'}" ></div>
+                <div>{{vidaJogador}}%</div> 
+            </div>
+            <div class= "score">
+                <h1><div>Monstro</div> </h1>
+                <div class="life" :style="{'width': vidaMonstro+'%'}" ></div>   
+                <div>{{vidaMonstro}}%</div>
+            </div>
+        </div> 
+        <div class="box2" v-if= "endGame">
+            <div  v-if= "0 >= vidaJogador">
+                Você Perdeu
+            </div>
+            <div v-else= "0 >= vidaMonstro">
+                Você Ganhou
+            </div>
+        </div>
+        
+        <div class="box2">
+            <template v-if = "running">
+                <button @click= ataque :style="{'background-color': 'greenyellow','border':'solid green 2px','margin': '10px'}">Ataque</button>
+                <button @click= ataqueEspecial :style="{'background-color': 'red','border':'solid purple     2px','margin': '10px'}">Ataque Especial</button>
+                <button @click= curar :style="{'background-color': 'aquamarine','border':'solid blue 2px','margin': '10px'}">Cura</button>
+                <button @click= desistir :style="{'background-color': 'gray','border':'solid black 2px','margin': '10px'}">Desistir</button>
+            </template>
+            <div v-else>
+                <button @click = "start">Começar novo jogo</button>
+            </div>
+        </div>
+        <div v-if= "logs != 0" class="box3" >
+            <div v-for="(log, i) in logs">
+                <div class="message" :style="{'background-color':'rgb(74, 74, 252)'}">{{log[0]}}</div>
+                <div class="message":style="{'background-color':'rgb(250, 45, 45)'}">{{log[1]}}</div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script>
+        new Vue({ 
+                el: '#app', 
+                data: { 
+                    logs: [],
+                    vidaJogador: 100,
+                    vidaMonstro: 100,
+                    running: false, 
+                    endGame: false
+                },
+                methods: {
+                    ataque: function(){
+                        danoJogador = Math.floor(Math.random()*6 + 5)
+                        danoMonstro = Math.floor(Math.random()*6 + 8)
+                        this.logs.push(['Jogador deu uma chapuletada de '+danoJogador+' de dano','O monstro deu uma de revesgueio de '+danoMonstro+' de dano'])
+                        this.vidaMonstro -= danoJogador;
+                        this.vidaJogador -= danoMonstro;
+                    },
+                    ataqueEspecial: function(){
+                        danoJogador = Math.floor(Math.random()*11    + 6)
+                        danoMonstro = Math.floor(Math.random()*6 + 8)
+                        this.logs.push(['O jogador deu uma chapuletada diferenciada e causou '+ danoJogador+' de dano','O monstro deu uma de revesgueio de '+danoMonstro+' de dano'])
+                        this.vidaMonstro -= danoJogador;
+                        this.vidaJogador -= danoMonstro;
+                    },
+                    curar: function(){
+                        curaJogador = Math.floor(Math.random()*15 + 5)
+                        danoMonstro = Math.floor(Math.random()*6 + 8)
+                        this.logs.push(['O jogador curou '+curaJogador+' de vida','O monstro deu uma de revesgueio de '+danoMonstro+ ' de dano'])
+                        this.vidaJogador += curaJogador;
+                        this.vidaJogador -= danoMonstro;
+                    },
+                    start: function(){
+                        this.vidaJogador = 100
+                        this.vidaMonstro = 100
+                        this.running = true
+                        this.endGame = false
+                        this.logs = []
+                    },
+                    desistir: function(){
+                        this.running = false;
+                    },
+                },
+                watch: {
+                    vidaJogador(att){
+                        if(att <=0 ){
+                            this.vidaJogador = 0
+                            this.endGame = true
+                            this.running = false
+
+                        }
+                        else if(att>=100) this.vidaJogador = 100
+                    },
+                    vidaMonstro(att, old){
+                        if(att <=0 ){
+                            this.vidaMonstro = 0
+                            this.endGame = true
+                            this.running = false
+                        }   
+                    }
+                },
+            })
+    </script>
+</body>
+
+
+</html>
